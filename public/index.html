@@ -1,0 +1,57 @@
+<!DOCTYPE>
+<html ng-app="app">
+<head>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+    <title>Contact List App</title>
+</head>
+<body>
+<div class="container" ng-controller="mainCtrl as vm">
+    <h1>Users List App</h1>
+    <button class="btn btn-danger" ng-click="vm.delAll()">Delete All Users</button>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Score</th>
+            <th>Action</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr>
+            <td>&nbsp;</td>
+            <td><input class="form-control" ng-model="vm.user.name"></td>
+            <td><input class="form-control" ng-model="vm.user.score"></td>
+            <td><button class="btn btn-primary" ng-click="vm.addUser()">Add User</button></td>
+        </tr>
+        <tr ng-repeat="user in vm.db">
+            <td>{{user.id}}
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">{{user.name}}</span>
+                <input class="form-control" ng-model="user.name" ng-if="!vm.view[$index]">
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">{{user.score}}</span>
+                <input class="form-control" ng-model="user.score" ng-if="!vm.view[$index]">
+            </td>
+            <td><button class="btn btn-danger" ng-click="vm.delete(user.id)">Remove</button></td>
+            <td ng-if="vm.view[$index]"><button class="btn btn-warning" ng-click="vm.view[$index] = false">Edit</button></td>
+            <td ng-if="!vm.view[$index]"><button class="btn btn-warning" ng-click="vm.save(user.id)">Save</button></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.12/angular.min.js"></script>
+<script src="controllers/controller.js"></script>
+</body>
+</html>
