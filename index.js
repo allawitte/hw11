@@ -35,7 +35,7 @@ app.get('/thankyou', function (req, res) {
 
 
 
-app.put('/update/:id/:name/:score', function(req, res) {
+app.put('/update?*', function(req, res) {
     console.log('FORM: ',req.query.form );
     console.log('Name: ',req.body.name );
     console.log('Score: ',req.body.score );
@@ -45,24 +45,6 @@ app.put('/update/:id/:name/:score', function(req, res) {
 
 app.use(function (req, res, next) {
     console.log('Looking for URL:' + req.url);
-    next();
-});
-
-var session = require('express-session');
-
-var parseurl = require('parseurl');
-
-
-
-
-app.use(function(req, res, next) {
-    var views = req.session.views;
-    if(!views) {
-        views = req.session.views = {};
-    }
-
-    var pathname = parseurl(req).pathname;
-    views[pathname] = (views[pathname] || 0) + 1;
     next();
 });
 
