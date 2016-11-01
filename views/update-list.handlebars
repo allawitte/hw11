@@ -1,0 +1,28 @@
+<div class="page-header">
+    <h3>List of members</h3>
+</div>
+<table class="table">
+    <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Score</th>
+    </tr>
+</table>
+{{#each data}}
+    <div class="row">
+        <form action="/update" name="form{{@index}}" method="put">
+            <div class="col-md-1">
+                <input type="text" name="id" value={{this.id}} />
+            </div>
+            <div class="col-md-2">
+                <input type=text value={{this.name}} name="name"/>
+            </div>
+            <div class="col-md-2">
+                <input type="text" value={{this.score}} name="score"/>
+            </div>
+            <div class="col-md-2">
+                <input type="submit" value="Update"/>
+            </div>
+        </form>
+    </div>
+{{/each}}
