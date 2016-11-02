@@ -22,7 +22,7 @@ app.get('/users', function (req, res) {
 
 app.post('/add/', function(req, res) {
     if( !req.body.name || !req.body.score) {
-        res.send('403 wrong params of object user');
+        res.status(403).send('Wrong params of object user');
         return;
     }
     var id = db[db.length-1].id + 1;
@@ -44,7 +44,7 @@ app.delete('/delete/:all', function(req, res) {
         return;
     }
     else {
-        res.send('403 wrong delete param');
+        res.status(403).send('Wrong delete param');
     }
 });
 
@@ -57,7 +57,7 @@ app.delete('/delete/:id', function(req, res) {
             ind = index;        }
     });
     if(ind === null) {
-        res.send('404, user not found');
+        res.status(404).send('User is not found');
         return;
     }
     db.splice(ind, 1);

@@ -18,7 +18,10 @@
                 res.forEach(function(item){
                     vm.view.push(true);
                 });
-            });
+            })
+                .error(function(data, status) {
+                    console.error('Get all users error', status, data);
+                });
         };
 
 
@@ -26,6 +29,9 @@
             $http.delete('delete/all').success(function(res) {
                 vm.db = res;
             })
+                .error(function(data, status) {
+                    console.error('Delete all users error', status, data);
+                })
         }
 
         function save(id) {
@@ -40,18 +46,26 @@
                 return;
             }
             console.log('saving updates...');
-            $http.put('edit/' + id, vm.db[ind]).success(function(res) {
+            $http.put('edit/' + id, vm.db[ind])
+                .success(function(res) {
                 console.log(res);
                 vm.view[ind] = true;
                 vm.user = {};
-            });
+            })
+                .error(function(data, status) {
+                    console.error('Update error', status, data);
+                });
         }
         function addUser() {
-            $http.post('add', vm.user).success(function(res) {
+            $http.post('add', vm.user)
+                .success(function(res) {
                 console.log(res);
                 vm.db.push(vm.user);
                 vm.view.push(true);
-            });
+            })
+                .error(function(data, status) {
+                    console.error('Add User error', status, data);
+                });
         }
 
         function del(id) {
@@ -66,11 +80,15 @@
                 return;
             }
             console.log('deleting user...');
-            $http.delete('delete/' + id).success(function(res) {
+            $http.delete('delete/' + id)
+                .success(function(res) {
                 console.log(res);
                 vm.db.splice(ind, 1);
                 vm.view.splice(ind, 1);
-            });
+            })
+                .error(function(data, status) {
+                    console.error('Delete user error', status, data);
+                })            ;
         }
 
 
