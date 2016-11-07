@@ -65,16 +65,12 @@ app.post('/add/', function(req, res) {
 });
 
 app.delete('/deleteall', function(req, res) {
-    var all = req.params.all;
-    if (all == 'all') {
+
         db = [];
         console.log('Users deleted');
         res.json(db);
         return;
-    }
-    else {
-        res.status(403).send('Wrong delete param');
-    }
+
 });
 
 app.delete('/delete/:id', function(req, res) {
