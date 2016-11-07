@@ -13,7 +13,18 @@
 <div class="container" ng-controller="mainCtrl as vm">
     <h1>Users List App</h1>
     <button class="btn btn-danger" ng-click="vm.delAll()">Delete All Users</button>
-
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <input type="text" class="form-control" ng-model="vm.field"/>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <button class="btn btn-success" ng-click="vm.search(vm.field)">Search</button>
+            </div>
+        </div>
+    </div>
     <table class="table">
         <thead>
         <tr>
@@ -32,7 +43,7 @@
             <td><input class="form-control" ng-model="vm.user.score"></td>
             <td><button class="btn btn-primary" ng-click="vm.addUser()">Add User</button></td>
         </tr>
-        <tr ng-repeat="user in vm.db">
+        <tr ng-repeat="user in vm.db track by $index">
             <td>{{user.id}}
             </td>
             <td>
@@ -49,6 +60,8 @@
         </tr>
         </tbody>
     </table>
+    <button class="btn-success" ng-click="vm.prevPage()">Prev</button>
+    <button class="btn-success" ng-click="vm.nextPage()">Next</button>
 
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.12/angular.min.js"></script>

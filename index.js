@@ -8,6 +8,15 @@ var db = [
     {id:2, name: 'Sony', score: 9},
     {id:3, name: 'Tobby', score: 11},
     {id:4, name: 'Alan', score: 12},
+    {id:5, name: 'Olifer', score: 3},
+    {id:6, name: 'Jully', score: 7},
+    {id:7, name: 'Sandy', score: 22},
+    {id:8, name: 'Jojy', score: 18},
+    {id:9, name: 'Nemie', score: 17},
+    {id:10, name: 'Rin', score: 15},
+    {id:11, name: 'Ronny', score: 19},
+    {id:12, name: 'Funny', score: 15},
+    {id:13, name: 'Tobby', score: 15},
 ];
 app.disable('x-powered-by');
 app.use(express.static(__dirname + '/public'));
@@ -16,8 +25,28 @@ app.set('port', process.env.PORT || '8888');
 app.use(bodyParser.json());
 
 app.get('/users', function (req, res) {
-    console.log('I received a GET request');
-    res.json(db);
+    console.log('GET request', req.query.field);
+
+    var field = req.query.field;
+    var limit = parseInt(req.query.limit, 10);
+    var offset = parseInt(req.query.offset, 10);
+    if (!field){
+        var arr = [];
+        console.log('No field');
+        arr = db.slice(offset, offset+limit);
+        res.json(arr);
+    }
+    else {
+        var arr = [];
+        console.log('Have field');
+        db.forEach(function (item) {
+            if (item.name == field) {
+                arr.push(item);
+            }
+        });
+        res.json(arr);
+    }
+
 });
 
 app.post('/add/', function(req, res) {
@@ -35,7 +64,7 @@ app.post('/add/', function(req, res) {
     res.json(db);
 });
 
-app.delete('/delete/:all', function(req, res) {
+app.delete('/deleteall', function(req, res) {
     var all = req.params.all;
     if (all == 'all') {
         db = [];

@@ -4,16 +4,26 @@
         .controller('mainCtrl', mainController);
     function mainController($http) {
         var vm = this;
+        var limit = 3;
+        var offset = 0;
+        var current = 1;
         vm.db = [];
         vm.view = [];
         vm.user = {};
         vm.addUser = addUser;
+        vm.field = '';
         vm.delete = del;
         vm.save = save;
+        vm.prevPage = prevPage;
+        vm.nextPage = nextPage;
         vm.delAll = delAll;
+        vm.search = search;
 
-        var getUsers = function () {
-            $http.get('/users').success(function (res) {
+        var getUsers = function (field) {
+            if (field === undefined) {
+                field = '';
+            }
+            $http.get('/users?limit='+limit+'&offset='+offset+'&field='+field).success(function (res) {
                 vm.db = res;
                 res.forEach(function(item){
                     vm.view.push(true);
@@ -24,9 +34,27 @@
                 });
         };
 
+        function search(field) {
+            console.log('field: ', field);
+            getUsers(field);
+        }
+
+        function nextPage() {
+            offset = limit*current;
+            current++;
+            getUsers();
+        }
+
+        function prevPage() {
+            current--;
+            current = current < 0 ? 0 : current;
+            console.log(current);
+            offset = limit*current;
+            getUsers();
+        }
 
         function delAll(){
-            $http.delete('delete/all').success(function(res) {
+            $http.delete('deleteall').success(function(res) {
                 vm.db = res;
             })
                 .error(function(data, status) {
