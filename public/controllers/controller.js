@@ -1,5 +1,5 @@
 'use strict';
-(function() {
+(function () {
     angular.module('app', [])
         .controller('mainCtrl', mainController);
     function mainController($http) {
@@ -10,113 +10,120 @@
         vm.db = [];
         vm.view = [];
         vm.user = {};
-        vm.addUser = addUser;
+        vm.addContact = addContact;
         vm.field = '';
         vm.delete = del;
-        vm.save = save;
-        vm.prevPage = prevPage;
-        vm.nextPage = nextPage;
+        vm.update = update;
         vm.delAll = delAll;
         vm.search = search;
 
         var getUsers = function (field) {
-            if (field === undefined) {
-                field = '';
-            }
-            $http.get('/users?limit='+limit+'&offset='+offset+'&field='+field).success(function (res) {
+
+            $http.get('/contacts').success(function (res) {
                 vm.db = res;
-                res.forEach(function(item){
+                console.log(res);
+                res.forEach(function (item) {
                     vm.view.push(true);
                 });
             })
-                .error(function(data, status) {
+                .error(function (data, status) {
                     console.error('Get all users error', status, data);
                 });
         };
 
-        function search(field) {
-            console.log('field: ', field);
-            getUsers(field);
-        }
-
-        function nextPage() {
-            offset = limit*current;
-            current++;
-            getUsers();
-        }
-
-        function prevPage() {
-            current--;
-            current = current < 0 ? 0 : current;
-            console.log(current);
-            offset = limit*current;
-            getUsers();
-        }
-
-        function delAll(){
-            $http.delete('deleteall').success(function(res) {
+        function search() {
+            console.log('field: ',vm.find);
+            var searchStr ='';
+            for (var key in vm.find) {
+                if(vm.find[key]) {
+                    searchStr += "&"+key+'='+vm.find[key];
+                }
+            }
+            searchStr = searchStr.substring(1);
+            if (searchStr.length > 1) {
+                searchStr = '?'+searchStr;
+            }
+            console.log('searchStr: ', searchStr);
+            $http.get('/search'+searchStr).success(function (res) {
                 vm.db = res;
+                console.log(res);
+                res.forEach(function (item) {
+                    vm.view.push(true);
+                });
             })
-                .error(function(data, status) {
+                .error(function (data, status) {
+                    console.error('Find contacts error', status, data);
+                });
+        }
+
+
+        function delAll() {
+            $http.delete('deleteall').success(function (res) {
+                vm.db = [];
+            })
+                .error(function (data, status) {
                     console.error('Delete all users error', status, data);
                 })
         }
 
-        function save(id) {
+        function update(id) {
             var ind = null;
-            vm.db.forEach(function(item, index){
-                if (item.id == id) {
+            vm.db.forEach(function (item, index) {
+                if (item._id == id) {
                     ind = index;
                 }
             });
             if (ind == null) {
-                console.log( 'User does not exist' );
+                console.log('User does not exist');
                 return;
             }
             console.log('saving updates...');
-            $http.put('edit/' + id, vm.db[ind])
-                .success(function(res) {
-                console.log(res);
-                vm.view[ind] = true;
-                vm.user = {};
-            })
-                .error(function(data, status) {
+            $http.put('/edit/' + id, vm.db[ind])
+                .success(function (res) {
+                    console.log(res);
+                    vm.view[ind] = true;
+                    vm.user = {};
+                })
+                .error(function (data, status) {
                     console.error('Update error', status, data);
                 });
         }
-        function addUser() {
-            $http.post('add', vm.user)
-                .success(function(res) {
-                console.log(res);
-                vm.db.push(vm.user);
-                vm.view.push(true);
-            })
-                .error(function(data, status) {
+
+        function addContact() {
+            console.log(vm.user);
+            $http.post('/add', vm.user)
+                .success(function (res) {
+                    console.log(res);
+                    vm.db.push(vm.user);
+                    vm.view.push(true);
+                    vm.user = {};
+                })
+                .error(function (data, status) {
                     console.error('Add User error', status, data);
                 });
         }
 
         function del(id) {
             var ind = null;
-            vm.db.forEach(function(item, index){
-                if (item.id == id) {
+            vm.db.forEach(function (item, index) {
+                if (item._id == id) {
                     ind = index;
                 }
             });
             if (ind == null) {
-                console.log( 'User does not exist' );
+                console.log('User does not exist');
                 return;
             }
             console.log('deleting user...');
             $http.delete('delete/' + id)
-                .success(function(res) {
-                console.log(res);
-                vm.db.splice(ind, 1);
-                vm.view.splice(ind, 1);
-            })
-                .error(function(data, status) {
+                .success(function (res) {
+                    console.log(res);
+                    vm.db.splice(ind, 1);
+                    vm.view.splice(ind, 1);
+                })
+                .error(function (data, status) {
                     console.error('Delete user error', status, data);
-                })            ;
+                });
         }
 
 

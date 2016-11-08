@@ -11,58 +11,62 @@
 </head>
 <body>
 <div class="container" ng-controller="mainCtrl as vm">
-    <h1>Users List App</h1>
-    <button class="btn btn-danger" ng-click="vm.delAll()">Delete All Users</button>
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <input type="text" class="form-control" ng-model="vm.field" placeholder="search by name"/>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <button class="btn btn-success" ng-click="vm.search(vm.field)">Search</button>
-            </div>
-        </div>
-    </div>
+    <h1>Записная книжка</h1>
+    <button class="btn btn-danger" ng-click="vm.delAll()">Удалить всех</button>
     <table class="table">
         <thead>
         <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Score</th>
-            <th>Action</th>
+            <th>&nbsp;#&nbsp;</th>
+            <th>Имя</th>
+            <th>Отчество</th>
+            <th>Фамилия</th>
+            <th>Телефон</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
         <tbody>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input class="form-control" ng-model="vm.find.name"></td>
+            <td><input class="form-control" ng-model="vm.find.secondname"></td>
+            <td><input class="form-control" ng-model="vm.find.familyname"></td>
+            <td><input class="form-control" ng-model="vm.find.phone"></td>
+            <td><button class="btn btn-primary" ng-click="vm.search()">Найти</button></td>
+        </tr>
 
         <tr>
             <td>&nbsp;</td>
             <td><input class="form-control" ng-model="vm.user.name"></td>
-            <td><input class="form-control" ng-model="vm.user.score"></td>
-            <td><button class="btn btn-primary" ng-click="vm.addUser()">Add User</button></td>
+            <td><input class="form-control" ng-model="vm.user.secondname"></td>
+            <td><input class="form-control" ng-model="vm.user.familyname"></td>
+            <td><input class="form-control" ng-model="vm.user.phone"></td>
+            <td><button class="btn btn-primary" ng-click="vm.addContact()">Добавить</button></td>
         </tr>
-        <tr ng-repeat="user in vm.db track by $index">
-            <td>{{user.id}}
+        <tr ng-repeat="contact in vm.db track by $index">
+            <td>{{$index}}<input type="hidden" ng-model="contact._id" />
             </td>
             <td>
-                <span ng-if="vm.view[$index]">{{user.name}}</span>
-                <input class="form-control" ng-model="user.name" ng-if="!vm.view[$index]">
+                <span ng-if="vm.view[$index]">{{contact.name}}</span>
+                <input class="form-control" ng-model="contact.name" ng-if="!vm.view[$index]">
             </td>
             <td>
-                <span ng-if="vm.view[$index]">{{user.score}}</span>
-                <input class="form-control" ng-model="user.score" ng-if="!vm.view[$index]">
+                <span ng-if="vm.view[$index]">{{contact.secondname}}</span>
+                <input class="form-control" ng-model="contact.secondname" ng-if="!vm.view[$index]">
             </td>
-            <td><button class="btn btn-danger" ng-click="vm.delete(user.id)">Remove</button></td>
-            <td ng-if="vm.view[$index]"><button class="btn btn-warning" ng-click="vm.view[$index] = false">Edit</button></td>
-            <td ng-if="!vm.view[$index]"><button class="btn btn-warning" ng-click="vm.save(user.id)">Save</button></td>
+            <td>
+                <span ng-if="vm.view[$index]">{{contact.familyname}}</span>
+                <input class="form-control" ng-model="contact.familyname" ng-if="!vm.view[$index]">
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">{{contact.phone}}</span>
+                <input class="form-control" ng-model="contact.phone" ng-if="!vm.view[$index]">
+            </td>
+            <td><button class="btn btn-danger" ng-click="vm.delete(contact._id)">Удалить</button></td>
+            <td ng-if="vm.view[$index]"><button class="btn btn-warning" ng-click="vm.view[$index] = false">Изменить</button></td>
+            <td ng-if="!vm.view[$index]"><button class="btn btn-warning" ng-click="vm.update(contact._id)">Сохранить</button></td>
         </tr>
         </tbody>
     </table>
-    <button class="btn-success" ng-click="vm.prevPage()">Prev</button>
-    <button class="btn-success" ng-click="vm.nextPage()">Next</button>
-
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.12/angular.min.js"></script>
 <script src="controllers/controller.js"></script>
