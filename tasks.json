@@ -1,0 +1,15 @@
+{"_id":{"$oid":"582b6e3a02f7081a3072f62f"},"name":"Ремонт крыши","status":true,"personal":[{"$oid":"582b0c0b98a0400c8c48d88a"},{"$oid":"582b0c0b98a0400c8c48d88d"}],"__v":0}
+{"_id":{"$oid":"582b7297fc23a80fc0390899"},"name":"Чистка снега","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d884"},{"$oid":"582b0c0b98a0400c8c48d889"}],"__v":0}
+{"_id":{"$oid":"582ba20f3695761c7c0cf7a4"},"name":"Покраска скамеек","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d884"},{"$oid":"582b0c0b98a0400c8c48d885"}],"__v":0}
+{"_id":{"$oid":"582ba4af3695761c7c0cf7a5"},"name":"Чистка бассейна","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d886"},{"$oid":"582b0c0b98a0400c8c48d887"}],"__v":0}
+{"_id":{"$oid":"582ba809a69b24064462fcc9"},"name":"Стрижка газонов","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d886"},{"$oid":"582b0c0b98a0400c8c48d889"},{"$oid":"582b0c0b98a0400c8c48d88a"}],"__v":0}
+{"_id":{"$oid":"582babfe6bc93c0544439990"},"name":"озеленение газонов","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d886"},{"$oid":"582b0c0b98a0400c8c48d889"}],"__v":0}
+{"_id":{"$oid":"582bb3fdc4f8971ea8ee14a3"},"name":"мытье полов","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d885"},{"$oid":"582b0c0b98a0400c8c48d886"}],"__v":0}
+{"_id":{"$oid":"582bb4abc4f8971ea8ee14a4"},"name":"мытье полов","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d885"},{"$oid":"582b0c0b98a0400c8c48d886"}],"__v":0}
+{"_id":{"$oid":"582bb51cc4f8971ea8ee14a5"},"name":"Поливка огорода","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d887"},{"$oid":"582b0c0b98a0400c8c48d888"}],"__v":0}
+{"_id":{"$oid":"582bb560c4f8971ea8ee14a6"},"name":"Прополка","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d888"},{"$oid":"582b0c0b98a0400c8c48d889"}],"__v":0}
+{"_id":{"$oid":"582bb6b5c4f8971ea8ee14a7"},"name":"Мытье подъезда","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d887"},{"$oid":"582b0c0b98a0400c8c48d889"}],"__v":0}
+{"_id":{"$oid":"582bb92f9f40e01548211573"},"name":"Мытье подъезда","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d887"},{"$oid":"582b0c0b98a0400c8c48d889"}],"__v":0}
+{"_id":{"$oid":"582bb98a0657c32768b02ac7"},"name":"Мытье подъезда","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d887"},{"$oid":"582b0c0b98a0400c8c48d889"}],"__v":0}
+{"_id":{"$oid":"582c70b9f13e791ca8535a83"},"name":"Чистка снега","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d884"},{"$oid":"582b0c0b98a0400c8c48d887"}],"__v":0}
+{"_id":{"$oid":"582c7134f13e791ca8535a84"},"name":"Чистка снега","status":false,"personal":[{"$oid":"582b0c0b98a0400c8c48d885"},{"$oid":"582b0c0b98a0400c8c48d889"}],"__v":0}

@@ -1,0 +1,42 @@
+<div class="container">
+    <h1>Список персонала</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>&nbsp;#&nbsp;</th>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Телефон</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input class="form-control" ng-model="vm.pers.name"></td>
+            <td><input class="form-control" ng-model="vm.pers.familyname"></td>
+            <td><input class="form-control" ng-model="vm.pers.phone"></td>
+            <td><button class="btn btn-primary" ng-click="vm.addPers()">Добавить</button></td>
+        </tr>
+        <tr ng-repeat="pers in vm.db track by $index">
+            <td>{{$index}}<input type="hidden" ng-model="pers._id" />
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">{{pers.name}}</span>
+                <input class="form-control" ng-model="pers.name" ng-if="!vm.view[$index]">
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">{{pers.familyname}}</span>
+                <input class="form-control" ng-model="pers.familyname" ng-if="!vm.view[$index]">
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">{{pers.phone}}</span>
+                <input class="form-control" ng-model="pers.phone" ng-if="!vm.view[$index]">
+            </td>
+            <td><button class="btn btn-danger" ng-click="vm.delete(pers._id)">Удалить</button></td>
+            <td ng-if="vm.view[$index]"><button class="btn btn-warning" ng-click="vm.view[$index] = false">Изменить</button></td>
+            <td ng-if="!vm.view[$index]"><button class="btn btn-warning" ng-click="vm.updatepers(pers._id)">Сохранить</button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>

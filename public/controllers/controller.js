@@ -1,7 +1,38 @@
 'use strict';
 (function () {
-    angular.module('app', [])
-        .controller('mainCtrl', mainController);
+    angular.module('app', ['ui.router'])
+        .config(config)
+        .controller('mainCtrl', mainController)
+        .controller('tasksCtrl', tasksController)
+        .controller('statCtrl', statController);
+
+    function config($stateProvider, $urlRouterProvider) {
+        $urlRouterProvider.otherwise('/pers');
+
+        $stateProvider
+            .state('/pers', {
+                url: '',
+                controller: 'mainCtrl',
+                templateUrl: 'pages/pers.html',
+                controllerAs: 'vm',
+                id: "home"
+            })
+            .state('/tasks', {
+                url: '/tasks',
+                controller: 'tasksCtrl',
+                templateUrl: 'pages/tasks.html',
+                controllerAs: 'vm',
+                id: "home"
+            })
+            .state('/stat', {
+                url: '/stat',
+                controller: 'statCtrl',
+                templateUrl: 'pages/stat.html',
+                controllerAs: 'vm',
+                id: "home"
+            });
+
+    }
     function mainController($http) {
         var vm = this;
         var limit = 3;
@@ -10,16 +41,16 @@
         vm.db = [];
         vm.view = [];
         vm.user = {};
-        vm.addContact = addContact;
+        vm.addPers = addPers;
         vm.field = '';
         vm.delete = del;
-        vm.update = update;
+        vm.updatepers = updatepers;
         vm.delAll = delAll;
         vm.search = search;
 
-        var getUsers = function (field) {
+        var getPersonal = function (field) {
 
-            $http.get('/contacts').success(function (res) {
+            $http.get('/personal').success(function (res) {
                 vm.db = res;
                 console.log(res);
                 res.forEach(function (item) {
@@ -66,7 +97,7 @@
                 })
         }
 
-        function update(id) {
+        function updatepers(id) {
             var ind = null;
             vm.db.forEach(function (item, index) {
                 if (item._id == id) {
@@ -77,29 +108,30 @@
                 console.log('User does not exist');
                 return;
             }
-            console.log('saving updates...');
-            $http.put('/edit/' + id, vm.db[ind])
+            console.log('saving updates...', vm.db[ind]);
+            $http.put('/editpers/' + id, vm.db[ind])
                 .success(function (res) {
                     console.log(res);
+                    vm.db = res;
                     vm.view[ind] = true;
-                    vm.user = {};
+                    vm.pers = {};
                 })
                 .error(function (data, status) {
                     console.error('Update error', status, data);
                 });
         }
 
-        function addContact() {
-            console.log(vm.user);
-            $http.post('/add', vm.user)
+        function addPers() {
+            console.log(vm.pers);
+            $http.post('/addpers', vm.pers)
                 .success(function (res) {
                     console.log(res);
-                    vm.db.push(vm.user);
+                    vm.db = res;
                     vm.view.push(true);
-                    vm.user = {};
+                    vm.pers = {};
                 })
                 .error(function (data, status) {
-                    console.error('Add User error', status, data);
+                    console.error('Add personal error', status, data);
                 });
         }
 
@@ -115,7 +147,7 @@
                 return;
             }
             console.log('deleting user...');
-            $http.delete('delete/' + id)
+            $http.delete('deletepers/' + id)
                 .success(function (res) {
                     console.log(res);
                     vm.db.splice(ind, 1);
@@ -127,10 +159,152 @@
         }
 
 
-        getUsers();
+        getPersonal();
 
 
     }
+
+    function tasksController($http) {
+        console.log('tasks');
+        var vm = this;
+        vm.personal = [];
+        vm.task = {
+            name: '',
+            status: false,
+            pers: [],
+        };
+        vm.tasks = [];
+        vm.view = [];
+        vm.addTask = add;
+        vm.delete = del;
+        vm.updatetask = updatetask;
+        vm.searchTask = searchTask;
+        vm.search = {
+            name: ''
+        };
+
+        function searchTask(){
+            var searchStr = "name="+vm.search.name;
+            $http.get('/searchtask/?'+searchStr)
+                .success(function(res){
+                    res.forEach(function(itm){
+                        vm.view.push(true);
+                        itm.exec.forEach(function(item, index){
+                            itm.exec[index] = item[0];
+                        })
+                    });
+                    vm.tasks = res;
+                    vm.tasks['pers'] = [];
+                })
+                .error(function(data, status){
+                    console.error('Get tasks error', status, data);
+                });
+        }
+
+        var getTasks = function() {
+            $http.get('gettasks')
+            .success(function(res){
+                    res.forEach(function(itm){
+                        vm.view.push(true);
+                        itm.exec.forEach(function(item, index){
+                            itm.exec[index] = item[0];
+                        })
+                    });
+                    vm.tasks = res;
+                    vm.tasks['pers'] = [];
+                })
+                .error(function(data, status){
+                    console.error('Get tasks error', status, data);
+                });
+        };
+        getTasks();
+
+        function add() {
+            $http.post('/addtask', vm.task)
+            .success(function(res){
+                    res.forEach(function(itm){
+                        itm.exec.forEach(function(item, index){
+                            itm.exec[index] = item[0];
+                        })
+                    });
+                    vm.tasks = res;
+                    vm.tasks['pers'] = [];
+                    vm.view.push(true);
+                    vm.task = {};
+                })
+            .error(function(data, status){
+                    console.error('Add task error', status, data);
+                })
+        }
+
+        function del(id) {
+            $http.delete('/deltask/' + id)
+            .success(function(res) {
+                    res.forEach(function(itm){
+                        vm.view.push(true);
+                        itm.exec.forEach(function(item, index){
+                            itm.exec[index] = item[0];
+                        })
+                    });
+                    vm.tasks = res;
+                    vm.tasks['pers'] = [];
+                })
+                .error(function(data, status){
+                    console.error('Delete tasks error', status, data);
+                });
+        }
+
+        function updatetask(id) {
+            vm.tasks.forEach(function(item, index) {
+                if (item._id == id) {
+                    delete item.exec;
+                    var obj = vm.tasks[index];
+                    $http.put('/updatetask/'+id, obj)
+                        .success(function(res) {
+                            res.forEach(function(itm){
+                                itm.exec.forEach(function(item, index){
+                                    itm.exec[index] = item[0];
+                                });
+                            });
+                            vm.tasks = res;
+                            vm.tasks['pers'] = [];
+                            vm.view[index] = true;
+                        })
+                        .error(function(data, status){
+                            console.error('Delete tasks error', status, data);
+                        });
+                }
+            });
+        }
+
+        var getPersonal = function () {
+
+            $http.get('/personal').success(function (res) {
+                vm.personal = res;
+                res.forEach(function (item) {
+                    vm.view.push(true);
+                });
+            })
+                .error(function (data, status) {
+                    console.error('Get all users error', status, data);
+                });
+        };
+
+        getPersonal();
+
+    }
+    function statController($http) {
+        var vm = this;
+        vm.db = [];
+
+        var getStats = function() {
+            $http.get('/getstats')
+            .success(function(res) {
+                    console.log(res);
+                    vm.db = res;
+                });
+        }
+        getStats();    }
 })();
 /**
  * Created by HP on 11/1/2016.

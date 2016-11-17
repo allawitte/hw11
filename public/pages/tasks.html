@@ -1,0 +1,62 @@
+<div class="container">
+    <h1>Список задач</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>&nbsp;#&nbsp;</th>
+            <th>Название</th>
+            <th>Статус</th>
+            <th>Назначенный персонал</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input class="form-control" ng-model="vm.search.name"></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td><button class="btn btn-primary" ng-click="vm.searchTask()">Найти</button></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input class="form-control" ng-model="vm.task.name"></td>
+            <td><input type="checkbox" ng-model="vm.task.status"></td>
+            <td><select class="form-control" ng-model="vm.task.pers" multiple>
+                <option ng-repeat="item in vm.personal track by $index" value={{item._id}}>{{item.name}}&nbsp;{{item.familyname}}</option>
+            </select>
+            </td>
+
+            <td><button class="btn btn-primary" ng-click="vm.addTask()">Добавить</button></td>
+        </tr>
+        <tr ng-repeat="task in vm.tasks track by $index">
+            <td>{{$index}}<input type="hidden" ng-model="task._id" />
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">{{task.name}}</span>
+                <input class="form-control" ng-model="task.name" ng-if="!vm.view[$index]">
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">{{task.status}}</span>
+                <input class="form-control" ng-model="task.status" ng-if="!vm.view[$index]" type="checkbox">
+            </td>
+            <td>
+                <span ng-if="vm.view[$index]">
+                    <span ng-repeat="item in task.exec">
+                        {{item.name}}&nbsp;{{item.familyname}}&nbsp;&nbsp;
+                    </span>
+
+                </span>
+                <select class="form-control" ng-model="task.pers" ng-if="!vm.view[$index]" multiple size="6">
+                    <option value={{item._id}} ng-repeat="item in vm.personal track by $index">{{item.name}}&nbsp;{{item.familyname}}</option>
+                </select>
+
+            </td>
+            <td><button class="btn btn-danger" ng-click="vm.delete(task._id)">Удалить</button></td>
+            <td ng-if="vm.view[$index]"><button class="btn btn-warning" ng-click="vm.view[$index] = false">Изменить</button></td>
+            <td ng-if="!vm.view[$index]"><button class="btn btn-warning" ng-click="vm.updatetask(task._id)">Сохранить</button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>

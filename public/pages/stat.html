@@ -1,0 +1,29 @@
+<div class="container">
+    <h1>Список персонала с неоконченными задачами</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>&nbsp;#&nbsp;</th>
+            <th>Имя</th>
+            <th>Фамилия</th>
+            <th>Количество задач</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr ng-repeat="pers in vm.db track by $index">
+            <td>{{$index + 1}}</td>
+            <td>
+                <span>{{pers.stats[0].name}}</span>
+            </td>
+            <td>
+                <span>{{pers.stats[0].familyname}}</span>
+            </td>
+            <td>
+                <span>{{pers.count}}</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

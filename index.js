@@ -2,8 +2,12 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/planner');
+var db = mongoose.connection;
+
 var mongojs = require('mongojs');
-var db = mongojs('contacts',['contactslist']);
+var db = mongojs('planner',['tasks', 'personal']);
 
 
 app.disable('x-powered-by');
@@ -11,126 +15,234 @@ app.use(express.static(__dirname + '/public'));
 app.use(require('body-parser').urlencoded({extended: true}));
 app.set('port', process.env.PORT || '3300');
 app.use(bodyParser.json());
-app.engine('html', require('ejs').renderFile);
+
+var Schema = mongoose.Schema;
+var personalSchema = new Schema({
+    name: {type: String, required: true},
+    familyname: {type: String, required: true},
+    phone: String
+}, {collection: 'personal'});
+
+var tasksSchema = new Schema({
+    name: {type: String, requires: true},
+    status: {type: Boolean, required: true},
+    personal: [{type: mongoose.Schema.ObjectId}]
+}, {collection: 'tasks'});
+
+var Personal = mongoose.model('Personal', personalSchema);
+var Task = mongoose.model('Task', tasksSchema);
+
 //fill up db for test
-var contactsArr = [
-    {"name":"Ольга","secondname":"Николаевна","familyname":"Иванова","phone":"90177712345"},
-    {"name":"Андрей","secondname":"Петрович","familyname":"Смирнов","phone":"9171234567"},
-    {"name":"Сергей","secondname":"Александрович","familyname":"Петренко","phone":"9041234567"},
-    {"name":"Анна","secondname":"Анатольевна","familyname":"Пыжевская","phone":"9051234567"},
-    {"name":"Ольга","secondname":"Юрьевна","familyname":"Киндурис","phone":"9151234567"},
-    {"name":"Светлана","secondname":"Александровна","familyname":"Мороз","phone":"9081234567"},
-    {"name":"Семен","secondname":"Сергеевич","familyname":"Симоненко","phone":"9031234567"},
-    {"name":"Станисолав","secondname":"Эдуардович","familyname":"Юдин","phone":"9037654321"},
-    {"name":"Мария","secondname":"Яковлевна","familyname":"Милова","phone":"9085671234"},
-    {"name":"Ольга","secondname":"Васильевна","familyname":"Зазнобина","phone":"4567123456"}
+var personalArr = [
+    {"name": "Ольга", "familyname": "Иванова", "phone": "90177712345"},
+    {"name": "Андрей", "familyname": "Смирнов", "phone": "9171234567"},
+    {"name": "Сергей", "familyname": "Петренко", "phone": "9041234567"},
+    {"name": "Анна", "familyname": "Пыжевская", "phone": "9051234567"},
+    {"name": "Ольга", "familyname": "Киндурис", "phone": "9151234567"},
+    {"name": "Светлана", "familyname": "Мороз", "phone": "9081234567"},
+    {"name": "Семен", "familyname": "Симоненко", "phone": "9031234567"},
+    {"name": "Станисолав", "familyname": "Юдин", "phone": "9037654321"},
+    {"name": "Мария", "familyname": "Милова", "phone": "9085671234"},
+    {"name": "Ольга", "familyname": "Зазнобина", "phone": "4567123456"}
 ];
-var setDb = function(){
-    db.contactslist.insert(contactsArr, function(err, result) {
-        if (err) {
+
+var setDb = function () {
+    personalArr.forEach(item => {
+        var data = new Personal(item);
+        data.save(err => {
             console.log(err);
-        }
-        else {
-            console.log('Contacts array is successfully added to the db contacts');
-        }
+        });
     });
 };
-setDb();
+
+
+//setDb();
 
 var getDb = function(req, res) {
-    db.contactslist.find(function(err, doc) {
+    Personal.find(function(err, pers) {
         if (err) {
-            res.status(403).send('Data base error');
+            res.status(403).send(err);
         }
         else {
-            res.json(doc);
+            res.status(200).json(pers);
         }
     });
 };
 
-
-app.get('/',function(req, res){
-    res.render('index.html');
-});
-
-app.get('/contacts', function (req, res) {
-    getDb(req, res);
-});
-
-app.get('/search', function (req, res) {
-    var  finddata = req.query;
-
-    db.contactslist.find(finddata, function(err, result) {
-        if(err){
-            res.status(403).send(err);
-        }
-        else {
-           res.json(result);
-
-        }
-    })
-});
-
-app.post('/add', function(req, res) {
-
-    var newUser = {
-        "name":req.body.name,
-        "secondname":req.body.secondname,
-        "familyname":req.body.familyname,
-        "phone":req.body.phone
-    };
-    if( !req.body.name && !req.body.secondname &&  !req.body.familyname && !req.body.phone) {
-        res.status(403).send('Wrong params of object contacts');
-        return;
-    }
-    db.contactslist.insert(newUser, function(err, result) {
-        if(err) {
-            res.status(403).send(err);
-        }
-        else {
-            getDb(req, res);
-        }
-    });
-
-});
-
-app.delete('/deleteall', function(req, res) {
-
-        db.contactslist.remove({}, function(err, result) {
-            if(err) {
-                res.status(403).send(err);
+var tasksAgg = function(req, res) {
+    db.tasks.aggregate(
+        {$unwind: '$personal'}
+        ,{$lookup: {
+            from: "personal",
+            localField: "personal",
+            foreignField: "_id",
+            as: "stats"
+        }}
+        ,{ $group : { _id : "$_id", name: {$first: "$name"}, status: {$first: "$status"}, exec: { $push: "$stats" } } }
+        ,function(err, result){
+            if(err){
+                console.log(err);
             }
             else {
                 res.status(200).json(result);
             }
         });
+};
 
-});
+var getTasks = function(req, res) {
 
-app.delete('/delete/:id', function(req, res) {
-    var id = req.params.id;
-    console.log('id= ',id);
-    db.contactslist.remove({_id: id}, function(err, result) {
-        if(err) {
+    Task.find(function(err, pers) {
+        if (err) {
             res.status(403).send(err);
         }
         else {
-            console.log(result);
+            tasksAgg(req, res);
+        }
+    });
+};
+
+
+app.get('/', function (req, res) {
+    res.render('index.html');
+});
+
+app.get('/personal', function (req, res) {
+    getDb(req, res)
+});
+
+app.get('/gettasks', function(req, res) {
+    getTasks(req, res);
+});
+
+app.post('/addpers', function (req, res) {
+
+    var newUser = {
+        "name": req.body.name,
+        "familyname": req.body.familyname,
+        "phone": req.body.phone
+    };
+    var data = new Personal(newUser);
+    if (!req.body.name && !req.body.familyname && !req.body.phone) {
+        res.status(403).send('Wrong params of object personal');
+        return;
+    }
+    data.save(data, function (err, result) {
+        if (err) {
+            res.status(403).send(err);
+        }
+        else {
+            getDb(req, res);
+        }
+    });
+
+});
+
+
+app.post('/addtask', function(req, res) {
+    var ObjectID = require('mongodb').ObjectID;
+    req.body.pers.forEach((item, index) => {
+        req.body.pers[index] = new ObjectID(item);
+    });
+
+    var newTask = {
+        'name':req.body.name,
+        'status':req.body.status,
+        'personal':req.body.pers
+    };
+
+    var data = new Task(newTask);
+    if (!req.body.name && !req.body.pers.length) {
+        res.status(403).send('Wrong params of object task');
+        return;
+    };
+    data.save(data, function (err, result) {
+        if (err) {
+            res.status(403).send(err);
+        }
+        else {
+            tasksAgg(req, res);
+        }
+    });
+});
+
+app.put('/updatetask/:id', function(req, res) {
+    var id = req.params.id;
+    var ObjectID = require('mongodb').ObjectID;
+    req.body.pers.forEach((item, index) => {
+        req.body.pers[index] = new ObjectID(item);
+    });
+
+    var data = {
+        'name':req.body.name,
+        'status':req.body.status,
+        'personal':req.body.pers
+    };
+
+    //var data = new Task(newTask);
+    if (!req.body.name && !req.body.pers.length) {
+        res.status(403).send('Wrong params of object task');
+        return;
+    };
+    Task.update({_id: id}, data, function (err, result) {
+        if (err) {
+            res.status(403).send("Error data update");
+        }
+        else {
+            tasksAgg(req, res);
+        }
+    });
+});
+
+app.delete('/deleteall', function (req, res) {
+
+    db.contactslist.remove({}, function (err, result) {
+        if (err) {
+            res.status(403).send(err);
+        }
+        else {
+            res.status(200).json(result);
+        }
+    });
+
+});
+
+app.delete('/deletepers/:id', function (req, res) {
+    var id = req.params.id;
+    Personal.remove({_id: id}, function (err, result) {
+        if (err) {
+            res.status(403).send("Error data delete");
+        }
+        else {
             getDb(req, res);
         }
     });
 });
 
-app.put('/edit/:id', function(req, res) {
+app.delete('/deltask/:id', function(req, res) {
     var id = req.params.id;
-    console.log(id);
-    var failure = true;
-    if( !req.body.name && !req.body.secondname &&  !req.body.familyname && !req.body.phone) {
+    Task.remove({_id: id}, function (err, result) {
+        if (err) {
+            res.status(403).send("Error task delete");
+        }
+        else {
+            tasksAgg(req, res);
+        }
+    });
+});
+
+app.put('/editpers/:id', function (req, res) {
+    var id = req.params.id;
+    if (!req.body.name && !req.body.familyname && !req.body.phone) {
         res.send('403 wrong params of object user');
         return;
     }
-    db.contactslist.update({_id: id}, req.body, function(err, result) {
-        if(err) {
+    var data = {
+        name: req.body.name,
+        familyname: req.body.familyname,
+        phone: req.body.phone
+    };
+    Personal.update({_id: id}, data, function (err, result) {
+        if (err) {
             res.status(403).send("Error data update");
         }
         else {
@@ -139,9 +251,59 @@ app.put('/edit/:id', function(req, res) {
     });
 });
 
-app.use(function (req, res, next) {
-    console.log('Looking for URL:' + req.url);
-    next();
+app.get('/searchtask', function(req, res) {
+    var finddata = req.query.name;
+    db.tasks.aggregate(
+        {$match:{name: {$regex: finddata, $options: "si"}}}
+        ,{$unwind: '$personal'}
+        ,{$lookup: {
+            from: "personal",
+            localField: "personal",
+            foreignField: "_id",
+            as: "stats"
+        }}
+        ,{ $group : { _id : "$_id", name: {$first: "$name"}, status: {$first: "$status"}, exec: { $push: "$stats" } } }
+        ,function(err, result){
+            if(err){
+                console.log(err);
+            }
+            else {
+                res.status(200).json(result);
+            }
+        });
+
+});
+
+app.get('/getstats', function(req, res) {
+    db.tasks.aggregate(
+        {$match:{status: false}}
+        ,{$unwind: '$personal'}
+
+        ,{$project: {name:1, personal:1, count: {$add: [1]}, _id:1}}
+
+        ,{$group: {
+            _id: "$personal",
+            count: { $sum: 1 }
+        }}
+        ,{$sort: {count: -1}}
+        ,{$lookup: {
+            from: "personal",
+            localField: "_id",
+            foreignField: "_id",
+            as: "stats"
+        }}
+        //,{$out: "mycoll"}
+        //,{$project: {name:1, stats: 1, count: {$add: [1]}}, _id:1}
+
+        ,function(err, result){
+            console.log('stats out');
+            if(err){
+                console.log(err);
+            }
+            else {
+               res.status(200).json(result);
+            }
+        });
 });
 
 app.listen(app.get('port'), function () {
